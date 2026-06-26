@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alcaryn</title>
+<meta name="description" content="Alcaryn — your eternal companion.">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Amiri&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000000;
+    --ink: #e9f6f4;
+    --muted: #8aa6a4;
+    --ice: #4fd0c8;
+    --ice-bright: #aef4ef;
+    --ice-deep: #1d6f86;
+    --glow: rgba(79, 208, 200, 0.55);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Cormorant Garamond", serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ---------- Animated starfield ---------- */
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* ---------- Ambient aura ---------- */
+  .aura {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(55vw 55vw at 50% 30%, rgba(79, 208, 200, 0.10), transparent 60%),
+      radial-gradient(45vw 45vw at 80% 85%, rgba(29, 111, 134, 0.10), transparent 60%),
+      radial-gradient(40vw 40vw at 15% 75%, rgba(174, 244, 239, 0.06), transparent 60%);
+    animation: drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    0%   { transform: scale(1) translateY(0); }
+    100% { transform: scale(1.12) translateY(-3%); }
+  }
+
+  /* ---------- Fixed header ---------- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.4rem 6vw;
+    backdrop-filter: blur(8px);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent);
+    transition: background .4s ease;
+  }
+  .brand {
+    font-family: "Cinzel Decorative", "Cinzel", serif;
+    font-weight: 700;
+    font-size: 1.3rem; letter-spacing: 0.22em;
+    color: var(--ice-bright); text-transform: uppercase;
+    text-shadow: 0 0 18px var(--glow);
+  }
+  .nav-links { display: flex; gap: 2.2rem; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 1.02rem; letter-spacing: 0.14em; text-transform: uppercase;
+    transition: color .3s ease;
+  }
+  .nav-links a:hover { color: var(--ice-bright); }
+  @media (max-width: 720px) { .nav-links { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; z-index: 2;
+    min-height: 100vh;
+    display: grid; place-items: center; text-align: center;
+    padding: 7rem 6vw 4rem;
+  }
+
+  .hero-orb {
+    position: relative;
+    width: min(60vmin, 480px);
+    height: min(60vmin, 480px);
+    margin: 0 auto 1.2rem;
+    display: grid; place-items: center;
+    animation: floaty 7s ease-in-out infinite;
+  }
+  @keyframes floaty {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-16px); }
+  }
+
+  /* Logo artwork — white background keyed out via SVG filter, glowing on black.
+     The glow lives on the wrapper so the clip-path can't shape it into a box. */
+  .logo-wrap {
+    width: 86%;
+    display: grid; place-items: center;
+    filter:
+      drop-shadow(0 0 22px rgba(79, 208, 200, 0.55))
+      drop-shadow(0 0 60px rgba(79, 208, 200, 0.28));
+    animation: glowpulse 6s ease-in-out infinite;
+  }
+  @keyframes glowpulse {
+    0%,100% { filter: drop-shadow(0 0 22px rgba(79,208,200,0.55)) drop-shadow(0 0 60px rgba(79,208,200,0.28)); }
+    50%     { filter: drop-shadow(0 0 32px rgba(174,244,239,0.7)) drop-shadow(0 0 84px rgba(79,208,200,0.4)); }
+  }
+  .logo {
+    width: 100%;
+    /* crop the wordmark off the bottom of the source art; keep the tree + crown base */
+    clip-path: inset(1% 4% 24% 4%);
+    margin-bottom: -6%;
+    filter: url(#whiteKey) brightness(1.12) saturate(1.2);
+    animation: shimmer 6s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%,100% { filter: url(#whiteKey) brightness(1.1) saturate(1.15); }
+    50%     { filter: url(#whiteKey) brightness(1.24) saturate(1.35); }
+  }
+
+  /* Rotating mystical rings */
+  .ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(79, 208, 200, 0.25);
+    animation: spin 30s linear infinite;
+    pointer-events: none;
+  }
+  .ring::before {
+    content: ""; position: absolute; top: -4px; left: 50%;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--ice-bright); box-shadow: 0 0 16px var(--ice-bright);
+    transform: translateX(-50%);
+  }
+  .ring.r1 { inset: -14%; }
+  .ring.r2 { inset: -34%; border-color: rgba(174, 244, 239, 0.20); animation-duration: 46s; animation-direction: reverse; }
+  .ring.r2::before { background: var(--ice); box-shadow: 0 0 16px var(--ice); }
+  .ring.r3 { inset: -56%; border-color: rgba(29, 111, 134, 0.30); animation-duration: 64s; }
+  .ring.r3::before { background: var(--ice-deep); box-shadow: 0 0 16px var(--ice-deep); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Wordmark ---------- */
+  .arabic {
+    font-family: "Amiri", serif;
+    font-size: clamp(1.3rem, 3.4vw, 2rem);
+    color: var(--ice); opacity: 0; letter-spacing: 0.05em;
+    margin-bottom: 0.2rem;
+    animation: rise 1.2s ease forwards .2s;
+  }
+  h1.wordmark {
+    font-family: "Cinzel Decorative", "Cinzel", serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 11vw, 7rem);
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    margin-left: 0.22em; /* optical centering for tracking */
+    background: linear-gradient(160deg, var(--ice-bright) 0%, var(--ice) 45%, var(--ice-deep) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    text-shadow: 0 0 60px var(--glow);
+    opacity: 0;
+    animation: rise 1.3s ease forwards .45s;
+  }
+
+  .tagline {
+    max-width: 42ch; margin: 1.4rem auto 0;
+    font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+    font-style: italic; font-weight: 300;
+    color: var(--muted);
+    opacity: 0; animation: rise 1.2s ease forwards .75s;
+  }
+
+  .cta {
+    display: inline-flex; gap: 1rem; margin-top: 2.4rem;
+    opacity: 0; animation: rise 1.2s ease forwards 1s;
+  }
+  .btn {
+    font-family: "Cinzel", serif; font-size: 0.92rem;
+    letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none;
+    padding: 0.9rem 2.1rem; border-radius: 999px;
+    transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+  }
+  .btn-primary {
+    color: #04181a;
+    background: linear-gradient(120deg, var(--ice), var(--ice-bright));
+    box-shadow: 0 0 26px var(--glow);
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 0 40px var(--glow); }
+  .btn-ghost { color: var(--ice-bright); border: 1px solid rgba(79, 208, 200, 0.45); }
+  .btn-ghost:hover { background: rgba(79, 208, 200, 0.1); transform: translateY(-3px); }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .scroll-cue {
+    position: absolute; bottom: 1.8rem; left: 50%; transform: translateX(-50%);
+    color: var(--muted); font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
+    opacity: 0;
+    animation: rise 1.2s ease forwards 1.4s, bob 2.4s ease-in-out infinite 1.7s;
+  }
+  @keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 8px); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .arabic, h1.wordmark, .tagline, .cta, .scroll-cue { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+  <!-- White-key filter: removes the white background of the source artwork at render time -->
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <filter id="whiteKey" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="lum"/>
+      <feComponentTransfer in="lum" result="mask">
+        <feFuncA type="table" tableValues="1 1 1 1 1 1 1 1 0.45 0 0"/>
+      </feComponentTransfer>
+      <feComposite in="SourceGraphic" in2="mask" operator="in"/>
+    </filter>
+  </svg>
+
+  <canvas id="stars"></canvas>
+  <div class="aura"></div>
+
+  <nav>
+    <span class="brand">Alcaryn</span>
+    <div class="nav-links">
+      <a href="#origin">Coming soon</a>      
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <div class="hero-orb">
+        <span class="ring r1"></span>
+        <span class="ring r2"></span>
+        <span class="ring r3"></span>
+        <div class="logo-wrap">
+          <img class="logo" src="./Alcaryn-white.png" alt="Alcaryn — the tree of the eternal companion">
+        </div>
+      </div>      
+      <h1 class="wordmark">Alcaryn</h1>
+      <p class="tagline">The constant to every soul.</p>
+      <p class="arabic">قرين</p>      
+    </div>
+      </header>
+
+  <script>
+    // ---------- Starfield ----------
+    (function () {
+      const canvas = document.getElementById("stars");
+      const ctx = canvas.getContext("2d");
+      let w, h, stars;
+      const COUNT = 140;
+      const palette = ["#4fd0c8", "#aef4ef", "#1d6f86", "#e9f6f4", "#7fe3da"];
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        stars = Array.from({ length: COUNT }, () => ({
+          x: Math.random() * w, y: Math.random() * h,
+          r: Math.random() * 1.6 + 0.3,
+          a: Math.random(),
+          da: (Math.random() * 0.02 + 0.004) * (Math.random() < 0.5 ? -1 : 1),
+          vx: (Math.random() - 0.5) * 0.12, vy: (Math.random() - 0.5) * 0.12,
+          c: palette[Math.floor(Math.random() * palette.length)],
+        }));
+      }
+      function tick() {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+          s.a += s.da;
+          if (s.a <= 0.05 || s.a >= 1) s.da *= -1;
+          s.x += s.vx; s.y += s.vy;
+          if (s.x < 0) s.x = w; if (s.x > w) s.x = 0;
+          if (s.y < 0) s.y = h; if (s.y > h) s.y = 0;
+          ctx.globalAlpha = Math.max(0, Math.min(1, s.a));
+          ctx.fillStyle = s.c; ctx.shadowColor = s.c; ctx.shadowBlur = 8;
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(tick);
+      }
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      resize();
+      window.addEventListener("resize", resize);
+      if (!reduce) tick();
+      else { for (const s of stars) { ctx.globalAlpha = s.a; ctx.fillStyle = s.c; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); } }
+    })();
+
+    // ---------- Header background on scroll ----------
+    (function () {
+      const nav = document.querySelector("nav");
+      window.addEventListener("scroll", () => {
+        nav.style.background = window.scrollY > 40
+          ? "rgba(0,0,0,0.8)"
+          : "linear-gradient(to bottom, rgba(0,0,0,0.65), transparent)";
+      });
+    })();
+  </script>
+</body>
+</html>
