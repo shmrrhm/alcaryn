@@ -1,2 +1,2 @@
 # Alcaryn
-Alcaryn: the constant companion
+The constant to every soul.
